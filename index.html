@@ -3,61 +3,545 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#101827">
+<meta name="theme-color" content="#0b1220">
 <link rel="manifest" href="manifest.json">
 <title>همراه تریدر مارکت</title>
+
 <style>
-:root{color-scheme:dark;--bg:#101827;--panel:#182337;--line:#2c3a50;--text:#eef5ff;--muted:#9fb0c7;--accent:#7dd3fc}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Tahoma,Arial,sans-serif;padding:18px;line-height:1.8}
-main{max-width:760px;margin:auto}h1{font-size:25px;margin:8px 0}p{color:var(--muted);margin-top:0}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px;margin:14px 0}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.price{background:#111c2d;border-radius:12px;padding:12px}.symbol{color:var(--muted);font-size:13px}.value{font-size:20px;font-weight:bold;direction:ltr;text-align:right}
-button{background:var(--accent);color:#082032;border:0;border-radius:10px;padding:10px 16px;font-weight:bold;font-size:15px}
-small{color:var(--muted)}input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#111c2d;color:white;margin:6px 0 12px}
-@media(max-width:420px){.grid{grid-template-columns:1fr}}
+:root{
+ color-scheme:dark;
+ --bg:#0b1220;
+ --panel:#131f32;
+ --line:#26364e;
+ --text:#eef4ff;
+ --muted:#9eacc1;
+ --blue:#2868dc;
+ --green:#35c69a;
+ --red:#f06c82;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:var(--bg);
+ color:var(--text);
+ font-family:Tahoma,Arial,sans-serif;
+ padding:22px 16px 40px;
+ line-height:1.9;
+}
+main{max-width:760px;margin:auto}
+h1{font-size:27px;margin:6px 0 2px}
+.subtitle{color:var(--muted);margin:0 0 24px;font-size:15px}
+h2{font-size:20px;margin:0 0 16px}
+h3{font-size:17px;margin:0 0 12px}
+
+.warning{
+ background:#302a19;
+ border:1px solid #67572d;
+ color:#e8d49a;
+ border-radius:17px;
+ padding:13px 15px;
+ margin:0 0 20px;
+ font-size:13px;
+}
+
+.tabs{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:10px;
+ margin:20px 0 22px;
+}
+.tab{
+ border:0;
+ border-radius:17px;
+ background:#18263d;
+ color:var(--text);
+ padding:15px 8px;
+ font:bold 16px Tahoma;
+ min-height:78px;
+}
+.tab.active{background:var(--blue)}
+
+.panel{display:none}
+.panel.active{display:block}
+
+.grid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:12px;
+}
+
+.quote{
+ background:var(--panel);
+ border:1px solid var(--line);
+ border-radius:22px;
+ padding:17px 16px;
+ min-height:132px;
+}
+.symbol{color:var(--muted);font-size:14px}
+.value{
+ font-size:25px;
+ font-weight:800;
+ direction:ltr;
+ text-align:right;
+ margin-top:9px;
+ letter-spacing:.2px;
+}
+.quote-meta{
+ font-size:12px;
+ color:var(--muted);
+ margin-top:2px;
+}
+
+.section-title{font-size:20px;margin:25px 0 14px}
+.card{
+ background:var(--panel);
+ border:1px solid var(--line);
+ border-radius:22px;
+ padding:18px;
+ margin:16px 0;
+}
+.market-row{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
+ padding:13px 0;
+ border-bottom:1px solid var(--line);
+}
+.market-row:last-child{border-bottom:0}
+
+.pill{
+ font-size:12px;
+ padding:7px 11px;
+ border-radius:13px;
+ background:#173b38;
+ color:var(--green);
+ white-space:nowrap;
+}
+.pill.neutral{
+ background:#283247;
+ color:#c2ccdc;
+}
+
+button.primary{
+ background:#76cafa;
+ color:#082033;
+ border:0;
+ border-radius:14px;
+ padding:13px 20px;
+ font:bold 16px Tahoma;
+ width:100%;
+ margin-top:14px;
+}
+.status{
+ font-size:12px;
+ color:var(--muted);
+ margin-top:9px;
+ display:block;
+}
+label{
+ display:block;
+ color:var(--muted);
+ font-size:14px;
+ margin:12px 0 4px;
+}
+input{
+ width:100%;
+ padding:13px;
+ border-radius:12px;
+ border:1px solid var(--line);
+ background:#0e192b;
+ color:white;
+ font:16px Tahoma;
+}
+.result{
+ font-size:19px;
+ font-weight:bold;
+ margin:15px 0 0;
+ color:#8bd5ff;
+}
+.notice{
+ font-size:13px;
+ color:var(--muted);
+ line-height:2;
+}
+
+@media(max-width:430px){
+ body{padding:18px 14px 32px}
+ .grid{gap:10px}
+ .quote{padding:13px;min-height:120px}
+ .value{font-size:22px}
+ .tab{font-size:14px;min-height:72px}
+}
 </style>
 </head>
-<body><main>
+
+<body>
+<main>
+
+<header>
 <h1>همراه تریدر مارکت</h1>
-<p>نمایش قیمت بازار و ابزار ساده مدیریت ریسک</p>
-<section class="card">
-<h3>قیمت‌های زنده</h3><div class="grid" id="prices">
-<div class="price"><div class="symbol">EUR/USD</div><div class="value" id="EURUSD">در حال دریافت…</div></div>
-<div class="price"><div class="symbol">طلا XAU/USD</div><div class="value" id="XAUUSD">در حال دریافت…</div></div>
-<div class="price"><div class="symbol">GBP/USD</div><div class="value" id="GBPUSD">در حال دریافت…</div></div>
-<div class="price"><div class="symbol">USD/JPY</div><div class="value" id="USDJPY">در حال دریافت…</div></div>
-</div><small id="status">در انتظار دریافت داده</small><br><button id="refresh">بروزرسانی قیمت‌ها</button>
+<p class="subtitle">
+نمای بازار، قیمت‌ها و ابزار ساده مدیریت ریسک
+</p>
+</header>
+
+<div class="warning">
+⚠️ قیمت‌ها از سرویس داده عمومی دریافت می‌شوند و ممکن است با منبع معاملاتی شما تفاوت داشته باشند.
+سیگنال‌ها آموزشی هستند و این نسخه معامله خودکار یا اتصال مستقیم MT5 ندارد.
+</div>
+
+<nav class="tabs" aria-label="بخش‌های برنامه">
+<button class="tab active" data-tab="market">بازار</button>
+<button class="tab" data-tab="signals">سیگنال آزمایشی</button>
+<button class="tab" data-tab="risk">محاسبه ریسک</button>
+</nav>
+
+<!-- بخش بازار -->
+<section class="panel active" id="market">
+
+<h2>قیمت‌های بازار</h2>
+
+<div class="grid">
+
+<div class="quote">
+<div class="symbol">EUR/USD</div>
+<div class="value" id="EURUSD">در حال دریافت…</div>
+<div class="quote-meta" id="EURUSD-meta">قیمت میانی</div>
+</div>
+
+<div class="quote">
+<div class="symbol">طلا · XAU/USD</div>
+<div class="value" id="XAUUSD">در حال دریافت…</div>
+<div class="quote-meta" id="XAUUSD-meta">قیمت میانی</div>
+</div>
+
+<div class="quote">
+<div class="symbol">GBP/USD</div>
+<div class="value" id="GBPUSD">در حال دریافت…</div>
+<div class="quote-meta" id="GBPUSD-meta">قیمت میانی</div>
+</div>
+
+<div class="quote">
+<div class="symbol">USD/JPY</div>
+<div class="value" id="USDJPY">در حال دریافت…</div>
+<div class="quote-meta" id="USDJPY-meta">قیمت میانی</div>
+</div>
+
+</div>
+
+<span class="status" id="status">
+در انتظار دریافت داده
+</span>
+
+<button class="primary" id="refresh">
+به‌روزرسانی قیمت‌ها
+</button>
+
+<h2 class="section-title">نمای کلی بازار</h2>
+
+<div class="card">
+
+<div class="market-row">
+<span>طلا / XAUUSD</span>
+<span class="pill neutral" id="trend-XAUUSD">در انتظار داده</span>
+</div>
+
+<div class="market-row">
+<span>یورو / دلار</span>
+<span class="pill neutral" id="trend-EURUSD">در انتظار داده</span>
+</div>
+
+<div class="market-row">
+<span>پوند / دلار</span>
+<span class="pill neutral" id="trend-GBPUSD">در انتظار داده</span>
+</div>
+
+<div class="market-row">
+<span>دلار / ین</span>
+<span class="pill neutral" id="trend-USDJPY">در انتظار داده</span>
+</div>
+
+</div>
+
+<p class="notice">
+روند بازار فقط با مقایسه قیمت فعلی و نوبت قبلی نمایش داده می‌شود؛ درصد تغییر ساختگی نشان داده نمی‌شود.
+</p>
+
 </section>
-<section class="card"><h3>ماشین‌حساب ریسک</h3>
-<label>موجودی حساب (دلار)</label><input id="balance" type="number" value="1000" min="0">
-<label>درصد ریسک</label><input id="risk" type="number" value="1" min="0" max="100" step="0.1">
-<button id="calc">محاسبه مبلغ ریسک</button><p id="result">مبلغ ریسک: ۱۰ دلار</p>
+
+<!-- بخش سیگنال -->
+<section class="panel" id="signals">
+
+<h2>سیگنال آزمایشی</h2>
+
+<div class="card">
+
+<h3>تحلیل آموزشی</h3>
+
+<p class="notice">
+موتور تحلیل تکنیکال تأییدشده هنوز فعال نیست.
+برای جلوگیری از سیگنال گمراه‌کننده، پیشنهاد خرید یا فروش نمایش داده نمی‌شود.
+</p>
+
+<div class="market-row">
+<span>وضعیت قیمت‌ها</span>
+<span class="pill neutral" id="signal-status">
+در حال بررسی
+</span>
+</div>
+
+</div>
+
 </section>
-<section class="card"><h3>یادآوری</h3><small>این برنامه ابزار اطلاعاتی و آموزشی است. داده‌ها ممکن است با تأخیر یا قطعی همراه باشند. این اطلاعات توصیه خرید یا فروش نیستند و معامله خودکار یا اتصال MT5 در این نسخه فعال نیست.</small></section>
+
+<!-- بخش محاسبه ریسک -->
+<section class="panel" id="risk">
+
+<h2>محاسبه ریسک معامله</h2>
+
+<div class="card">
+
+<label for="balance">موجودی حساب (دلار)</label>
+<input
+ id="balance"
+ type="number"
+ value="1000"
+ min="0"
+ step="any"
+>
+
+<label for="risk">درصد ریسک در هر معامله</label>
+<input
+ id="risk"
+ type="number"
+ value="1"
+ min="0"
+ max="100"
+ step="0.1"
+>
+
+<button class="primary" id="calc">
+محاسبه مبلغ ریسک
+</button>
+
+<p class="result" id="result">
+مبلغ ریسک: ۱۰ دلار
+</p>
+
+<p class="notice">
+این محاسبه آموزشی است و حجم معامله یا حد ضرر را خودکار تعیین نمی‌کند.
+</p>
+
+</div>
+</section>
+
 </main>
+
 <script>
-const symbols=["EURUSD","XAUUSD","GBPUSD","USDJPY"];
-async function updatePrices(){
- const status=document.getElementById("status");status.textContent="در حال دریافت قیمت‌ها…";
- for(const s of symbols){
-  const el=document.getElementById(s);
-  try{
-   const r=await fetch("https://biquote.io/api/"+encodeURIComponent(s)+"?allowStale=false",{cache:"no-store"});
-   if(!r.ok)throw new Error("HTTP "+r.status);
-   const d=await r.json();
-   const bid=Number(d.bid),ask=Number(d.ask);
-   if(d.stale||!Number.isFinite(bid)||!Number.isFinite(ask)||bid<=0||ask<bid)throw new Error("داده معتبر نیست");
-   el.textContent=((Number.isFinite(Number(d.mid))&&Number(d.mid)>0)?Number(d.mid):(bid+ask)/2).toFixed(s==="USDJPY"?3:5);
-  }catch(e){el.textContent="دریافت نشد";}
- }
- status.textContent="آخرین تلاش: "+new Date().toLocaleTimeString("fa-IR");
-}
-document.getElementById("refresh").addEventListener("click",updatePrices);
-document.getElementById("calc").addEventListener("click",()=>{
- const b=Number(document.getElementById("balance").value),p=Number(document.getElementById("risk").value);
- document.getElementById("result").textContent=(b>=0&&p>=0&&p<=100)?"مبلغ ریسک: "+(b*p/100).toFixed(2)+" دلار":"مقادیر واردشده معتبر نیستند";
+
+const symbols=[
+ "EURUSD",
+ "XAUUSD",
+ "GBPUSD",
+ "USDJPY"
+];
+
+const previous={};
+
+// تغییر بین بخش‌های برنامه
+document.querySelectorAll(".tab").forEach(btn=>{
+
+ btn.addEventListener("click",()=>{
+
+  document.querySelectorAll(".tab").forEach(x=>{
+   x.classList.toggle("active",x===btn);
+  });
+
+  document.querySelectorAll(".panel").forEach(x=>{
+   x.classList.toggle(
+    "active",
+    x.id===btn.dataset.tab
+   );
+  });
+
+ });
+
 });
-updatePrices();setInterval(updatePrices,30000);
-if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
-</script></body></html>
+
+// دریافت قیمت‌های زنده
+async function updatePrices(){
+
+ const status=document.getElementById("status");
+
+ status.textContent="در حال دریافت قیمت‌ها…";
+
+ let good=0;
+
+ for(const s of symbols){
+
+  const el=document.getElementById(s);
+
+  try{
+
+   const r=await fetch(
+    "https://biquote.io/api/"+
+    encodeURIComponent(s)+
+    "?allowStale=false",
+    {cache:"no-store"}
+   );
+
+   if(!r.ok){
+    throw new Error("HTTP "+r.status);
+   }
+
+   const d=await r.json();
+
+   const bid=Number(d.bid);
+   const ask=Number(d.ask);
+
+   if(
+    d.stale ||
+    !Number.isFinite(bid) ||
+    !Number.isFinite(ask) ||
+    bid<=0 ||
+    ask<bid
+   ){
+    throw new Error("داده نامعتبر");
+   }
+
+   const mid=
+    (
+     Number.isFinite(Number(d.mid)) &&
+     Number(d.mid)>0
+    )
+    ? Number(d.mid)
+    : (bid+ask)/2;
+
+   const digits=s==="USDJPY"?3:5;
+
+   el.textContent=mid.toFixed(digits);
+
+   document.getElementById(s+"-meta").textContent=
+    "Bid: "+bid.toFixed(digits)+
+    " · Ask: "+ask.toFixed(digits);
+
+   const t=document.getElementById("trend-"+s);
+
+   if(
+    previous[s]!==undefined &&
+    mid!==previous[s]
+   ){
+
+    t.textContent=
+     mid>previous[s]
+     ? "افزایش نسبت به نوبت قبل"
+     : "کاهش نسبت به نوبت قبل";
+
+    t.className=
+     "pill "+(mid>previous[s]?"":"neutral");
+
+   }else{
+
+    t.textContent=
+     previous[s]===undefined
+     ? "در حال جمع‌آوری داده"
+     : "بدون تغییر";
+
+    t.className="pill neutral";
+
+   }
+
+   previous[s]=mid;
+   good++;
+
+  }catch(e){
+
+   el.textContent="دریافت نشد";
+
+   document.getElementById(s+"-meta").textContent=
+    "خطا در دریافت قیمت";
+
+   document.getElementById("trend-"+s).textContent=
+    "داده ناموجود";
+
+   document.getElementById("trend-"+s).className=
+    "pill neutral";
+
+  }
+
+ }
+
+ status.textContent=
+  "آخرین به‌روزرسانی: "+
+  new Date().toLocaleTimeString("fa-IR")+
+  " · "+good+" از ۴ نماد";
+
+ document.getElementById("signal-status").textContent=
+  good===4
+  ? "قیمت‌ها دریافت شدند"
+  : "دریافت ناقص قیمت‌ها";
+
+}
+
+// دکمه به‌روزرسانی
+document.getElementById("refresh").addEventListener(
+ "click",
+ updatePrices
+);
+
+// محاسبه مبلغ ریسک
+document.getElementById("calc").addEventListener(
+ "click",
+ ()=>{
+
+  const b=Number(
+   document.getElementById("balance").value
+  );
+
+  const p=Number(
+   document.getElementById("risk").value
+  );
+
+  document.getElementById("result").textContent=
+
+   (
+    Number.isFinite(b) &&
+    Number.isFinite(p) &&
+    b>=0 &&
+    p>=0 &&
+    p<=100
+   )
+
+   ? "مبلغ ریسک: "+
+     (b*p/100).toFixed(2)+
+     " دلار"
+
+   : "مقادیر واردشده معتبر نیستند";
+
+ }
+);
+
+// شروع دریافت قیمت
+updatePrices();
+
+// به‌روزرسانی خودکار هر ۳۰ ثانیه
+setInterval(updatePrices,30000);
+
+// ثبت سرویس‌ورکر
+if("serviceWorker" in navigator){
+
+ window.addEventListener("load",()=>{
+
+  navigator.serviceWorker
+   .register("./sw.js")
+   .catch(()=>{});
+
+ });
+
+}
+
+</script>
+
+</body>
+</html>
