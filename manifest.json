@@ -1,10 +1,15 @@
+
 {
+  "id": "/",
   "name": "همراه تریدر مارکت",
-  "short_name": "تریدر مارکت",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#101827",
-  "theme_color": "#101827",
+  "short_name": "مارکت",
+  "description": "نمایش و بررسی قیمت بازارهای جهانی",
   "lang": "fa",
-  "dir": "rtl"
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220"
 }
