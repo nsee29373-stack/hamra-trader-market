@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<link rel="manifest" href="manifest.json">
+<title>همراه تریدر مارکت</title>
+<style>
+:root{color-scheme:dark;--bg:#101827;--panel:#182337;--line:#2c3a50;--text:#eef5ff;--muted:#9fb0c7;--accent:#7dd3fc}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Tahoma,Arial,sans-serif;padding:18px;line-height:1.8}
+main{max-width:760px;margin:auto}h1{font-size:25px;margin:8px 0}p{color:var(--muted);margin-top:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px;margin:14px 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.price{background:#111c2d;border-radius:12px;padding:12px}.symbol{color:var(--muted);font-size:13px}.value{font-size:20px;font-weight:bold;direction:ltr;text-align:right}
+button{background:var(--accent);color:#082032;border:0;border-radius:10px;padding:10px 16px;font-weight:bold;font-size:15px}
+small{color:var(--muted)}input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#111c2d;color:white;margin:6px 0 12px}
+@media(max-width:420px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main>
+<h1>همراه تریدر مارکت</h1>
+<p>نمایش قیمت بازار و ابزار ساده مدیریت ریسک</p>
+<section class="card">
+<h3>قیمت‌های زنده</h3><div class="grid" id="prices">
+<div class="price"><div class="symbol">EUR/USD</div><div class="value" id="EURUSD">در حال دریافت…</div></div>
+<div class="price"><div class="symbol">طلا XAU/USD</div><div class="value" id="XAUUSD">در حال دریافت…</div></div>
+<div class="price"><div class="symbol">GBP/USD</div><div class="value" id="GBPUSD">در حال دریافت…</div></div>
+<div class="price"><div class="symbol">USD/JPY</div><div class="value" id="USDJPY">در حال دریافت…</div></div>
+</div><small id="status">در انتظار دریافت داده</small><br><button id="refresh">بروزرسانی قیمت‌ها</button>
+</section>
+<section class="card"><h3>ماشین‌حساب ریسک</h3>
+<label>موجودی حساب (دلار)</label><input id="balance" type="number" value="1000" min="0">
+<label>درصد ریسک</label><input id="risk" type="number" value="1" min="0" max="100" step="0.1">
+<button id="calc">محاسبه مبلغ ریسک</button><p id="result">مبلغ ریسک: ۱۰ دلار</p>
+</section>
+<section class="card"><h3>یادآوری</h3><small>این برنامه ابزار اطلاعاتی و آموزشی است. داده‌ها ممکن است با تأخیر یا قطعی همراه باشند. این اطلاعات توصیه خرید یا فروش نیستند و معامله خودکار یا اتصال MT5 در این نسخه فعال نیست.</small></section>
+</main>
+<script>
+const symbols=["EURUSD","XAUUSD","GBPUSD","USDJPY"];
+async function updatePrices(){
+ const status=document.getElementById("status");status.textContent="در حال دریافت قیمت‌ها…";
+ for(const s of symbols){
+  const el=document.getElementById(s);
+  try{
+   const r=await fetch("https://biquote.io/api/"+encodeURIComponent(s)+"?allowStale=false",{cache:"no-store"});
+   if(!r.ok)throw new Error("HTTP "+r.status);
+   const d=await r.json();
+   const bid=Number(d.bid),ask=Number(d.ask);
+   if(d.stale||!Number.isFinite(bid)||!Number.isFinite(ask)||bid<=0||ask<bid)throw new Error("داده معتبر نیست");
+   el.textContent=((Number.isFinite(Number(d.mid))&&Number(d.mid)>0)?Number(d.mid):(bid+ask)/2).toFixed(s==="USDJPY"?3:5);
+  }catch(e){el.textContent="دریافت نشد";}
+ }
+ status.textContent="آخرین تلاش: "+new Date().toLocaleTimeString("fa-IR");
+}
+document.getElementById("refresh").addEventListener("click",updatePrices);
+document.getElementById("calc").addEventListener("click",()=>{
+ const b=Number(document.getElementById("balance").value),p=Number(document.getElementById("risk").value);
+ document.getElementById("result").textContent=(b>=0&&p>=0&&p<=100)?"مبلغ ریسک: "+(b*p/100).toFixed(2)+" دلار":"مقادیر واردشده معتبر نیستند";
+});
+updatePrices();setInterval(updatePrices,30000);
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+</script></body></html>
