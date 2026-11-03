@@ -274,3 +274,301 @@ footer{text-align:center;color:var(--muted);font-size:10px;padding:25px 12px 35p
 </main>
 
 <footer>همراه تریدر مارکت | ابزار مشاهده و بررسی بازارهای جهانی</footer>
+<script>
+"use strict";
+
+var API = "https://biquote.io/api/";
+
+var symbols = [
+  {id:"EUR/USD",api:"EURUSD",name:"یورو به دلار",digits:5},
+  {id:"XAU/USD",api:"XAUUSD",name:"طلا به دلار",digits:2},
+  {id:"GBP/USD",api:"GBPUSD",name:"پوند به دلار",digits:5},
+  {id:"USD/JPY",api:"USDJPY",name:"دلار به ین",digits:3}
+];
+
+var market = {};
+var daily = {};
+var positions = [];
+var virtualBalance = 10000;
+var requestNo = 0;
+
+symbols.forEach(function(s){
+  market[s.id] = {
+    bid:null,
+    ask:null,
+    mid:null,
+    previous:null,
+    stale:true
+  };
+  daily[s.id] = [];
+});
+
+function $(id){
+  return document.getElementById(id);
+}
+
+function fmt(v,d){
+  return Number.isFinite(v)
+    ? v.toLocaleString("en-US",{
+        minimumFractionDigits:d,
+        maximumFractionDigits:d
+      })
+    : "--";
+}
+
+function money(v){
+  return (v<0?"-$":"$") +
+    Math.abs(v).toLocaleString("en-US",{
+      minimumFractionDigits:2,
+      maximumFractionDigits:2
+    });
+}
+
+function setStatus(message,ok){
+  $("connectionStatus").textContent = message;
+  $("connectionText").textContent = message;
+  $("statusDot").style.background =
+    ok ? "var(--green)" : "var(--red)";
+}
+
+function renderCards(){
+  var html = "";
+
+  symbols.forEach(function(s){
+    var q = market[s.id];
+    var change = q.previous && q.mid
+      ? ((q.mid-q.previous)/q.previous)*100
+      : null;
+
+    html += `
+      <div class="card">
+        <div class="symbol">${s.id}</div>
+        <div class="name">${s.name}</div>
+        <div class="price">${fmt(q.mid,s.digits)}</div>
+        <div class="change ${change===null?"":change>=0?"up":"down"}">
+          ${change===null?"در انتظار داده":(change>=0?"+":"")+change.toFixed(2)+"%"}
+        </div>
+        <div class="quote">
+          <span>خرید: <b>${fmt(q.bid,s.digits)}</b></span>
+          <span>فروش: <b>${fmt(q.ask,s.digits)}</b></span>
+        </div>
+      </div>
+    `;
+  });
+
+  $("marketCards").innerHTML = html;
+}
+
+async function getJSON(url){
+  var response = await fetch(url,{
+    cache:"no-store"
+  });
+
+  if(!response.ok){
+    throw new Error("خطای دریافت اطلاعات: "+response.status);
+  }
+
+  return await response.json();
+}
+
+async function updatePrices(){
+  var currentRequest = ++requestNo;
+  var success = 0;
+
+  for(var i=0;i<symbols.length;i++){
+    var s = symbols[i];
+
+    try{
+      var data = await getJSON(
+        API+encodeURIComponent(s.api)+"?allowStale=false"
+      );
+
+      if(currentRequest!==requestNo) return;
+
+      var bid = Number(data.bid);
+      var ask = Number(data.ask);
+
+      if(
+        data.stale===true ||
+        !Number.isFinite(bid) ||
+        !Number.isFinite(ask) ||
+        bid<=0 ||
+        ask<=0 ||
+        ask<bid
+      ){
+        throw new Error("داده معتبر نیست");
+      }
+
+      var old = market[s.id].mid;
+      var mid = Number(data.mid);
+
+      if(!Number.isFinite(mid) || mid<=0){
+        mid = (bid+ask)/2;
+      }
+
+      market[s.id] = {
+        bid:bid,
+        ask:ask,
+        mid:mid,
+        previous:old || mid,
+        stale:false
+      };
+
+      success++;
+
+    }catch(error){
+      console.log("Price error:",s.id,error.message);
+    }
+  }
+
+  renderCards();
+
+  var now = new Date().toLocaleTimeString("fa-IR");
+
+  $("lastUpdate").textContent = now;
+  $("updateTime").textContent = now;
+
+  if(success>0){
+    setStatus(
+      success+" نماد از "+symbols.length+" نماد به‌روزرسانی شد",
+      true
+    );
+  }else{
+    setStatus("دریافت قیمت ناموفق بود؛ اتصال را بررسی کنید",false);
+  }
+
+  drawTrend();
+}
+
+function avg(values){
+  if(!values.length) return null;
+
+  return values.reduce(function(a,b){
+    return a+b;
+  },0)/values.length;
+}
+
+function drawTrend(){
+  var id = $("chartSymbol").value;
+  var s = symbols.find(function(x){
+    return x.id===id;
+  });
+
+  if(!s) return;
+
+  var q = market[id];
+
+  $("analysisPrice").textContent =
+    fmt(q.mid,s.digits);
+
+  var bars = daily[id] || [];
+  var closes = bars.map(function(b){
+    return Number(b.close);
+  }).filter(function(v){
+    return Number.isFinite(v) && v>0;
+  });
+
+  if(closes.length<2){
+    $("trendLabel").textContent = "داده تاریخی کافی نیست";
+    $("smaShort").textContent = "--";
+    $("smaLong").textContent = "--";
+    return;
+  }
+
+  var sma20 = avg(closes.slice(-20));
+  var sma50 = avg(closes.slice(-50));
+
+  $("smaShort").textContent = fmt(sma20,s.digits);
+  $("smaLong").textContent = fmt(sma50,s.digits);
+
+  var trend = sma20>sma50
+    ? "روند صعودی"
+    : sma20<sma50
+      ? "روند نزولی"
+      : "روند خنثی";
+
+  $("trendLabel").textContent = trend;
+
+  var values = closes.slice(-100);
+  var min = Math.min.apply(null,values);
+  var max = Math.max.apply(null,values);
+
+  if(min===max) max=min+1;
+
+  var points = values.map(function(v,i){
+    var x = 15+i*(570/(values.length-1));
+    var y = 185-((v-min)/(max-min))*165;
+    return x.toFixed(1)+","+y.toFixed(1);
+  }).join(" ");
+
+  $("priceChart").innerHTML = `
+    <polyline
+      points="${points}"
+      fill="none"
+      stroke="#55b9ff"
+      stroke-width="3"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  `;
+}
+
+async function loadHistory(){
+  var id = $("chartSymbol").value;
+  var s = symbols.find(function(x){
+    return x.id===id;
+  });
+
+  if(!s) return;
+
+  $("loadHistory").textContent = "در حال دریافت...";
+
+  try{
+    var end = Math.floor(Date.now()/1000);
+    var start = end-365*24*60*60;
+
+    var url =
+      API+encodeURIComponent(s.api)+
+      "/ohlc?interval=1d&limit=1000&from="+
+      start+"&to="+end;
+
+    var data = await getJSON(url);
+
+    var bars = Array.isArray(data.bars)
+      ? data.bars
+      : Array.isArray(data.candles)
+        ? data.candles
+        : Array.isArray(data.data)
+          ? data.data
+          : [];
+
+    daily[id] = bars.map(function(b){
+      return {
+        close:Number(b.close),
+        openTime:b.openTime || b.time || b.timestamp || b.date
+      };
+    }).filter(function(b){
+      return Number.isFinite(b.close) && b.close>0;
+    });
+
+    $("historyCount").textContent =
+      daily[id].length.toLocaleString("fa-IR");
+
+    $("historyRange").textContent =
+      daily[id].length
+        ? "آخرین داده‌های دریافتی"
+        : "داده‌ای موجود نیست";
+
+    drawTrend();
+
+  }catch(error){
+    $("historyRange").textContent =
+      "دریافت تاریخچه ناموفق بود";
+
+    console.log("History error:",error);
+
+  }finally{
+    $("loadHistory").textContent =
+      "دریافت تاریخچه یک‌ساله";
+  }
+}
