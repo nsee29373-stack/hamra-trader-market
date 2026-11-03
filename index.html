@@ -572,3 +572,160 @@ async function loadHistory(){
       "دریافت تاریخچه یک‌ساله";
   }
 }
+function updateTradeUI(){
+  $("virtualBalance").textContent = money(virtualBalance);
+
+  var totalPL = 0;
+
+  positions.forEach(function(p){
+    var q = market[p.symbol].mid;
+
+    if(Number.isFinite(q)){
+      totalPL += (p.side==="BUY"
+        ? q-p.entry
+        : p.entry-q)*p.qty;
+    }
+  });
+
+  $("openPL").textContent = money(totalPL);
+  $("openPL").className = totalPL>=0 ? "up" : "down";
+
+  if(!positions.length){
+    $("positions").innerHTML =
+      "هنوز معامله‌ای ثبت نشده است.";
+    return;
+  }
+
+  $("positions").innerHTML = positions.map(function(p){
+    var q = market[p.symbol].mid;
+    var pl = Number.isFinite(q)
+      ? (p.side==="BUY"?q-p.entry:p.entry-q)*p.qty
+      : 0;
+
+    return `
+      <div class="row">
+        <span>
+          ${p.side==="BUY"?"خرید":"فروش"} ${p.symbol}
+          <br>
+          <small class="muted">حجم: ${p.qty}</small>
+        </span>
+        <b class="${pl>=0?"up":"down"}">${money(pl)}</b>
+      </div>
+    `;
+  }).join("");
+}
+
+function openDemo(side){
+  var symbol = $("tradeSymbol").value;
+  var qty = Number($("tradeQty").value);
+  var price = market[symbol].mid;
+
+  if(!Number.isFinite(price) || price<=0){
+    alert("ابتدا باید قیمت نماد دریافت شود.");
+    return;
+  }
+
+  if(!Number.isFinite(qty) || qty<=0){
+    alert("حجم معامله معتبر نیست.");
+    return;
+  }
+
+  positions.push({
+    side:side,
+    symbol:symbol,
+    qty:qty,
+    entry:price
+  });
+
+  updateTradeUI();
+}
+
+function loadGlobal(){
+  $("gainers").textContent =
+    "اطلاعات این بخش به پاسخ سرویس بازار وابسته است.";
+
+  $("losers").textContent =
+    "برای دریافت فهرست برندگان و بازندگان، سرویس باید این داده را ارائه کند.";
+}
+
+function calculateRisk(){
+  var balance = Number($("balance").value);
+  var percent = Number($("riskPercent").value);
+
+  if(
+    !Number.isFinite(balance) ||
+    !Number.isFinite(percent) ||
+    balance<=0 ||
+    percent<0 ||
+    percent>100
+  ){
+    $("riskResult").textContent = "مقادیر را بررسی کنید";
+    return;
+  }
+
+  $("riskResult").textContent =
+    money(balance*percent/100);
+}
+
+document.querySelectorAll(".tab").forEach(function(button){
+  button.addEventListener("click",function(){
+    document.querySelectorAll(".tab").forEach(function(t){
+      t.classList.remove("active");
+    });
+
+    document.querySelectorAll(".view").forEach(function(v){
+      v.classList.remove("active");
+    });
+
+    button.classList.add("active");
+
+    var view = $(button.dataset.view);
+
+    if(view){
+      view.classList.add("active");
+    }
+  });
+});
+
+$("chartSymbol").addEventListener("change",function(){
+  drawTrend();
+});
+
+$("loadHistory").addEventListener("click",function(){
+  loadHistory();
+});
+
+$("buyBtn").addEventListener("click",function(){
+  openDemo("BUY");
+});
+
+$("sellBtn").addEventListener("click",function(){
+  openDemo("SELL");
+});
+
+$("resetDemo").addEventListener("click",function(){
+  if(confirm("حساب تمرینی بازنشانی شود؟")){
+    positions = [];
+    virtualBalance = 10000;
+    updateTradeUI();
+  }
+});
+
+$("refreshGlobal").addEventListener("click",function(){
+  loadGlobal();
+});
+
+$("calculateRisk").addEventListener("click",function(){
+  calculateRisk();
+});
+
+renderCards();
+updateTradeUI();
+loadGlobal();
+updatePrices();
+
+setInterval(updatePrices,30000);
+
+</script>
+</body>
+</html>
