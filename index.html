@@ -85,6 +85,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:15px}
 </head>
 <body>
 <div class="app">
+
 <header>
  <div>
   <h1>همراه تریدر مارکت</h1>
@@ -111,17 +112,21 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:15px}
    <input id="dataStatus" value="در انتظار دریافت..." readonly>
   </div>
  </div>
+
  <div class="stats" style="margin-top:12px">
   <div class="stat"><small>قیمت خرید (Ask)</small><strong id="ask">---</strong></div>
   <div class="stat"><small>قیمت فروش (Bid)</small><strong id="bid">---</strong></div>
   <div class="stat"><small>اختلاف قیمت</small><strong id="spread">---</strong></div>
   <div class="stat"><small>آخرین بروزرسانی</small><strong id="updated" style="font-size:12px">---</strong></div>
  </div>
+
  <div class="status" id="source">منبع قیمت: BiQuote</div>
+
  <div id="irrBox" class="notice hidden">
   نرخ زنده USD/IRR از منبع فعلی دریافت نمی‌شود.
   نرخ معتبر را دستی وارد کن؛ نرخ ساختگی نمایش داده نمی‌شود.
  </div>
+
  <div class="field hidden" id="irrField" style="margin-top:10px">
   <label>نرخ دستی هر دلار به ریال</label>
   <input id="irrRate" type="number" min="1" placeholder="مثلاً نرخ روز بازار">
@@ -168,6 +173,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:15px}
 
 <section class="card">
  <h2>ثبت سفارش آزمایشی</h2>
+
  <div class="row">
   <div class="field">
    <label>نوع سفارش</label>
@@ -176,58 +182,74 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:15px}
     <option value="SELL">SELL - فروش</option>
    </select>
   </div>
+
   <div class="field">
- <label>حجم معامله (لات)</label>
-<input id="volume" type="number" min="0.01" max="100" step="0.01" value="0.01">  
+   <label>حجم معامله (لات)</label>
+   <input id="volume" type="number" min="0.01" max="100" step="0.01" value="0.01">
   </div>
  </div>
+
  <div class="row" style="margin-top:9px">
   <div class="field">
    <label>قیمت ورود</label>
    <input id="entry" type="number" step="any" placeholder="قیمت ورود">
   </div>
+
   <div class="field">
    <label>حد ضرر (SL)</label>
    <input id="stopLoss" type="number" step="any" placeholder="حد ضرر">
   </div>
+
   <div class="field">
    <label>حد سود (TP)</label>
    <input id="takeProfit" type="number" step="any" placeholder="حد سود">
   </div>
  </div>
+
  <div class="row" style="margin-top:9px">
   <div class="field">
    <label>ریسک مجاز از موجودی (%)</label>
    <input id="riskPercent" type="number" min="0.1" max="100" step="0.1" value="1">
   </div>
+
   <div class="field">
    <label>برآورد ریسک سفارش</label>
    <input id="riskValue" readonly value="---">
   </div>
  </div>
+
  <div class="actions">
   <button class="buy" id="buyBtn">ثبت آزمایشی BUY</button>
   <button class="sell" id="sellBtn">ثبت آزمایشی SELL</button>
  </div>
- <div class="status" id="orderMessage">سفارش‌ها فقط در همین برنامه ذخیره می‌شوند.</div>
+
+ <div class="status" id="orderMessage">
+  سفارش‌ها فقط در همین برنامه ذخیره می‌شوند.
+ </div>
+
  <div class="notice">
-  پیش از ثبت سفارش، نماد، حجم، قیمت ورود، حد ضرر و حد سود را بررسی کن.
+  اگر قیمت ورود، حد ضرر یا حد سود را خالی بگذاری، برنامه برایت مقدار اولیه پیشنهاد می‌کند.
   این نسخه هیچ سفارشی به کارگزاری ارسال نمی‌کند.
  </div>
 </section>
 
 <section class="card">
  <h2>معاملات و سفارش‌های ثبت‌شده</h2>
+
  <div class="stats">
   <div class="stat"><small>تعداد سفارش‌ها</small><strong id="tradeCount">0</strong></div>
   <div class="stat"><small>سفارش‌های باز</small><strong id="openCount">0</strong></div>
   <div class="stat"><small>سود و زیان باز (برآورد)</small><strong id="totalPnl">0</strong></div>
   <div class="stat"><small>وضعیت اتصال MT5</small><strong class="bad">متصل نیست</strong></div>
  </div>
+
  <div id="tradeList" style="margin-top:10px">
   <div class="muted">هنوز سفارشی ثبت نشده است.</div>
  </div>
- <button class="secondary" id="clearTrades" style="width:100%;margin-top:10px">پاک کردن سوابق آزمایشی</button>
+
+ <button class="secondary" id="clearTrades" style="width:100%;margin-top:10px">
+  پاک کردن سوابق آزمایشی
+ </button>
 </section>
 
 <section class="card">
@@ -250,8 +272,12 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:15px}
 
 const $ = id => document.getElementById(id);
 const API = "https://biquote.io/api/";
+
 const symbols = {
- EURUSD:"EURUSD",GBPUSD:"GBPUSD",USDJPY:"USDJPY",XAUUSD:"XAUUSD"
+ EURUSD:"EURUSD",
+ GBPUSD:"GBPUSD",
+ USDJPY:"USDJPY",
+ XAUUSD:"XAUUSD"
 };
 
 let current = {bid:null,ask:null,mid:null};
@@ -261,29 +287,44 @@ let requestNumber = 0;
 
 function number(v){
  const n = Number(v);
- return Number.isFinite(n) ? n : null;
+ return v === "" || v === null || !Number.isFinite(n) ? null : n;
 }
+
 function fmt(v,d=5){
  if(!Number.isFinite(v)) return "---";
  return v.toLocaleString("en-US",{maximumFractionDigits:d});
 }
+
 function money(v){
  if(!Number.isFinite(v)) return "---";
  return v.toLocaleString("fa-IR",{maximumFractionDigits:0});
 }
-function selected(){return $("symbol").value}
-function saveTrades(){
- try{localStorage.setItem("htm_market_trades",JSON.stringify(trades))}
- catch(e){$("orderMessage").textContent="ذخیره‌سازی در گوشی ممکن نشد."}
+
+function selected(){
+ return $("symbol").value;
 }
+
+function saveTrades(){
+ try{
+  localStorage.setItem("htm_market_trades",JSON.stringify(trades));
+ }catch(e){
+  $("orderMessage").textContent="ذخیره‌سازی در گوشی ممکن نشد.";
+ }
+}
+
 function loadTrades(){
  try{
   const x=JSON.parse(localStorage.getItem("htm_market_trades")||"[]");
   trades=Array.isArray(x)?x:[];
- }catch(e){trades=[]}
+ }catch(e){
+  trades=[];
+ }
  renderTrades();
 }
-function setStatus(t){$("dataStatus").value=t}
+
+function setStatus(t){
+ $("dataStatus").value=t;
+}
 
 async function updatePrice(){
  const symbol=selected();
@@ -291,11 +332,14 @@ async function updatePrice(){
 
  if(symbol==="USDIRR"){
   current={bid:null,ask:null,mid:null};
+
   $("irrBox").classList.remove("hidden");
   $("irrField").classList.remove("hidden");
   $("source").textContent="منبع: نرخ دستی واردشده توسط کاربر";
   setStatus("داده زنده موجود نیست");
+
   const rate=number($("irrRate").value);
+
   if(rate && rate>0){
    current={bid:rate,ask:rate,mid:rate};
    showPrice();
@@ -303,7 +347,9 @@ async function updatePrice(){
    $("bid").textContent=$("ask").textContent="داده موجود نیست";
    $("spread").textContent="---";
    $("mainPrice").textContent="---";
+   $("updated").textContent="---";
   }
+
   updateAnalysis();
   updateRisk();
   renderTrades();
@@ -312,36 +358,63 @@ async function updatePrice(){
 
  $("irrBox").classList.add("hidden");
  $("irrField").classList.add("hidden");
+
  setStatus("در حال دریافت...");
+
  try{
   const url=API+encodeURIComponent(symbols[symbol])+"?allowStale=false";
   const response=await fetch(url,{cache:"no-store"});
+
   if(!response.ok) throw new Error("HTTP "+response.status);
+
   const data=await response.json();
+
   if(thisRequest!==requestNumber)return;
-  const bid=number(data.bid),ask=number(data.ask);
+
+  const bid=number(data.bid);
+  const ask=number(data.ask);
+
   if(data.stale || bid===null || ask===null || bid<=0 || ask<bid){
    throw new Error("داده معتبر نیست");
   }
+
   const mid=number(data.mid);
-  current={bid,ask,mid:mid && mid>0 ? mid : (bid+ask)/2};
+
+  current={
+   bid,
+   ask,
+   mid:mid && mid>0 ? mid : (bid+ask)/2
+  };
+
   history.push({time:Date.now(),price:current.mid});
+
   if(history.length>100)history.shift();
+
   setStatus("دریافت موفق");
   $("source").textContent="منبع: "+(data.source||"BiQuote");
+
   showPrice();
   drawChart();
   updateAnalysis();
   updateRisk();
   renderTrades();
+
  }catch(e){
   if(thisRequest!==requestNumber)return;
+
+  current={bid:null,ask:null,mid:null};
+
   setStatus("خطا در دریافت قیمت");
   $("source").textContent="ارتباط با منبع قیمت برقرار نشد.";
   $("bid").textContent=$("ask").textContent="---";
   $("spread").textContent="---";
+  $("mainPrice").textContent="---";
+
+  updateRisk();
+  renderTrades();
  }
 }
+
 function showPrice(){
  $("bid").textContent=fmt(current.bid);
  $("ask").textContent=fmt(current.ask);
@@ -349,72 +422,129 @@ function showPrice(){
  $("mainPrice").textContent=fmt(current.mid);
  $("updated").textContent=new Date().toLocaleTimeString("fa-IR");
 }
+
 function drawChart(){
- const c=$("chart"),ctx=c.getContext("2d");
+ const c=$("chart");
+ const ctx=c.getContext("2d");
  const w=c.width,h=c.height;
+
  ctx.clearRect(0,0,w,h);
- ctx.strokeStyle="#263951";ctx.lineWidth=1;
+ ctx.strokeStyle="#263951";
+ ctx.lineWidth=1;
+
  for(let i=1;i<5;i++){
-  let y=i*h/5;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();
+  let y=i*h/5;
+  ctx.beginPath();
+  ctx.moveTo(0,y);
+  ctx.lineTo(w,y);
+  ctx.stroke();
  }
+
  if(history.length<2)return;
+
  const vals=history.map(x=>x.price);
- const min=Math.min(...vals),max=Math.max(...vals);
+ const min=Math.min(...vals);
+ const max=Math.max(...vals);
  const range=max-min||Math.abs(max)*0.0001||1;
- ctx.strokeStyle="#38bdf8";ctx.lineWidth=3;ctx.beginPath();
+
+ ctx.strokeStyle="#38bdf8";
+ ctx.lineWidth=3;
+ ctx.beginPath();
+
  vals.forEach((v,i)=>{
   const x=i*w/(vals.length-1);
   const y=h-15-((v-min)/range)*(h-30);
-  if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+
+  if(i===0)ctx.moveTo(x,y);
+  else ctx.lineTo(x,y);
  });
+
  ctx.stroke();
 }
+
 function calcRSI(vals){
  if(vals.length<15)return null;
+
  let gains=0,losses=0;
+
  for(let i=vals.length-14;i<vals.length;i++){
   const diff=vals[i]-vals[i-1];
-  if(diff>0)gains+=diff;else losses-=diff;
+  if(diff>0)gains+=diff;
+  else losses-=diff;
  }
+
  if(losses===0)return 100;
+
  const rs=(gains/14)/(losses/14);
  return 100-(100/(1+rs));
 }
+
 function updateAnalysis(){
  const vals=history.map(x=>x.price);
+
  if(vals.length<3){
   $("trend").textContent="داده کافی نیست";
   $("trendText").textContent="برای تحلیل، چند قیمت متوالی لازم است.";
-  $("average").textContent="---";$("rsi").textContent="---";
+  $("average").textContent="---";
+  $("rsi").textContent="---";
+  $("marketState").textContent="نامشخص";
   return;
  }
+
  const first=vals[Math.max(0,vals.length-10)];
  const last=vals[vals.length-1];
  const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+
  const direction=last>first?"صعودی":last<first?"نزولی":"خنثی";
+
  $("trend").textContent=direction;
  $("trendText").textContent="روند کوتاه‌مدت: "+direction;
  $("average").textContent=fmt(avg);
+
  const rsi=calcRSI(vals);
+
  $("rsi").textContent=rsi===null?"داده کافی نیست":rsi.toFixed(1);
- $("marketState").textContent=rsi===null?"در حال بررسی":rsi>70?"احتمال اشباع خرید":rsi<30?"احتمال اشباع فروش":"متعادل";
+
+ $("marketState").textContent=
+  rsi===null?"در حال بررسی":
+  rsi>70?"احتمال اشباع خرید":
+  rsi<30?"احتمال اشباع فروش":"متعادل";
 }
-function getRisk(){
+
+/* اندازه قرارداد برای برآورد آموزشی ریسک و سود */
+function contractSize(symbol){
+ if(symbol==="XAUUSD")return 100;
+ if(symbol==="USDIRR")return 100000;
+ return 100000;
+}
+
+function getRisk(side){
  const entry=number($("entry").value);
  const sl=number($("stopLoss").value);
  const volume=number($("volume").value);
- if(entry===null||sl===null||volume===null||volume<=0)return null;
- const side=$("orderSide").value;
+
+ if(entry===null || sl===null || volume===null || volume<=0){
+  return null;
+ }
+
  const distance=side==="BUY"?entry-sl:sl-entry;
+
  if(distance<=0)return null;
- return distance*volume;
+
+ return distance*volume*contractSize(selected());
 }
+
 function updateRisk(){
- const risk=getRisk();
+ const side=$("orderSide").value;
+ const risk=getRisk(side);
+
  const balance=number($("balance").value);
  const rate=number($("conversionRate").value)||number($("irrRate").value);
- $("riskValue").value=risk===null?"حد ضرر را بررسی کن":fmt(risk,4)+" واحد تقریبی";
- if(balance!==null && balance>=0 && rate){
+
+ $("riskValue").value=
+  risk===null?"حد ضرر را بررسی کن":fmt(risk,4)+" واحد ارز مظنه";
+
+ if(balance!==null && balance>=0 && rate && rate>0){
   $("rialBalance").textContent=money(balance*rate)+" ریال";
   $("tomanBalance").textContent=money(balance*rate/10)+" تومان";
  }else{
@@ -422,13 +552,64 @@ function updateRisk(){
   $("tomanBalance").textContent="نرخ را وارد کنید";
  }
 }
+
 function estimatedPnl(t,price){
  const delta=t.side==="BUY"?price-t.entry:t.entry-price;
- const raw=delta*t.volume;
- if(t.symbol==="USDJPY")return raw/price;
- if(t.symbol==="USDIRR")return raw;
+ const raw=delta*t.volume*contractSize(t.symbol);
+
+ if(t.symbol==="USDJPY" && price>0)return raw/price;
+
+ if(t.symbol==="USDIRR" && price>0)return raw/price;
+
  return raw;
 }
+
+/* تکمیل خودکار فیلدهای خالی قبل از ثبت سفارش */
+function prepareOrder(side){
+ $("orderSide").value=side;
+
+ if(current.mid===null || !Number.isFinite(current.mid) || current.mid<=0){
+  $("orderMessage").textContent=
+   "ابتدا منتظر دریافت قیمت معتبر نماد انتخاب‌شده بمان.";
+  return;
+ }
+
+ const marketEntry=
+  selected()==="USDIRR" ? current.mid :
+  side==="BUY" ? current.ask : current.bid;
+
+ const entryInput=$("entry");
+ const slInput=$("stopLoss");
+ const tpInput=$("takeProfit");
+
+ if(number(entryInput.value)===null){
+  entryInput.value=marketEntry;
+ }
+
+ const entry=number(entryInput.value);
+
+ if(entry===null || entry<=0){
+  $("orderMessage").textContent="قیمت ورود معتبر نیست.";
+  return;
+ }
+
+ /* حد ضرر و حد سود پیشنهادی فقط برای فیلدهای خالی */
+ if(number(slInput.value)===null){
+  slInput.value=side==="BUY"
+   ? entry*0.999
+   : entry*1.001;
+ }
+
+ if(number(tpInput.value)===null){
+  tpInput.value=side==="BUY"
+   ? entry*1.002
+   : entry*0.998;
+ }
+
+ updateRisk();
+ registerOrder(side);
+}
+
 function registerOrder(side){
  const symbol=selected();
  const volume=number($("volume").value);
@@ -436,108 +617,222 @@ function registerOrder(side){
  const sl=number($("stopLoss").value);
  const tp=number($("takeProfit").value);
  const riskPercent=number($("riskPercent").value);
- if(!volume||volume<=0||entry===null||entry<=0||sl===null||tp===null){
-  $("orderMessage").textContent="لطفاً حجم، ورود، حد ضرر و حد سود را درست وارد کن.";
+
+ if(volume===null || volume<0.01 || volume>100){
+  $("orderMessage").textContent=
+   "حجم معامله باید بین ۰٫۰۱ تا ۱۰۰ لات باشد.";
   return;
  }
+
+ if(entry===null || entry<=0 || sl===null || tp===null){
+  $("orderMessage").textContent=
+   "لطفاً حجم، ورود، حد ضرر و حد سود را درست وارد کن.";
+  return;
+ }
+
  if(side==="BUY" && !(sl<entry && tp>entry)){
-  $("orderMessage").textContent="در خرید، حد ضرر باید پایین‌تر و حد سود بالاتر از ورود باشد.";
+  $("orderMessage").textContent=
+   "در خرید، حد ضرر باید پایین‌تر و حد سود بالاتر از ورود باشد.";
   return;
  }
+
  if(side==="SELL" && !(sl>entry && tp<entry)){
-  $("orderMessage").textContent="در فروش، حد ضرر باید بالاتر و حد سود پایین‌تر از ورود باشد.";
+  $("orderMessage").textContent=
+   "در فروش، حد ضرر باید بالاتر و حد سود پایین‌تر از ورود باشد.";
   return;
  }
- if(riskPercent===null||riskPercent<=0||riskPercent>100){
-  $("orderMessage").textContent="درصد ریسک باید بین ۰ تا ۱۰۰ باشد.";
+
+ if(riskPercent===null || riskPercent<0.1 || riskPercent>100){
+  $("orderMessage").textContent=
+   "درصد ریسک باید بین ۰٫۱ تا ۱۰۰ باشد.";
   return;
  }
- const risk=Math.abs(entry-sl)*volume;
+
+ const risk=getRisk(side);
  const balance=number($("balance").value);
- if(balance!==null && balance>0 && risk>balance*riskPercent/100){
-  $("orderMessage").textContent="هشدار: ریسک برآوردی از سقف ریسک انتخابی بیشتر است.";
-  return;
- }
+
  const t={
   id:Date.now()+Math.random(),
-  symbol,side,volume,entry,sl,tp,
-  status:"OPEN",created:new Date().toISOString()
+  symbol,
+  side,
+  volume,
+  entry,
+  sl,
+  tp,
+  risk,
+  riskPercent,
+  status:"OPEN",
+  created:new Date().toISOString()
  };
+
  trades.unshift(t);
+
  saveTrades();
  renderTrades();
- $("orderMessage").textContent="سفارش آزمایشی ثبت شد؛ به کارگزاری ارسال نشده است.";
+
+ let message="سفارش آزمایشی "+side+" با موفقیت ثبت شد.";
+
+ if(balance!==null && balance>0 && risk!==null){
+  message+=" برآورد ریسک: "+fmt(risk,4)+" واحد ارز مظنه.";
+ }
+
+ $("orderMessage").textContent=message+
+  " این سفارش به کارگزاری ارسال نشده است.";
 }
+
 function renderTrades(){
  const list=$("tradeList");
  let open=0,total=0;
+
  if(trades.length===0){
   list.innerHTML='<div class="muted">هنوز سفارشی ثبت نشده است.</div>';
  }else{
   list.innerHTML="";
+
   trades.forEach(t=>{
    const isOpen=t.status==="OPEN";
+
    if(isOpen)open++;
+
    const price=t.symbol===selected()?current.mid:null;
-   const pnl=isOpen&&price!==null?estimatedPnl(t,price):0;
-   if(isOpen&&Number.isFinite(pnl))total+=pnl;
+
+   const pnl=
+    isOpen && price!==null
+    ? estimatedPnl(t,price)
+    : 0;
+
+   if(isOpen && Number.isFinite(pnl))total+=pnl;
+
    const div=document.createElement("div");
    div.className="trade";
-   const head=document.createElement("div");head.className="trade-head";
+
+   const head=document.createElement("div");
+   head.className="trade-head";
+
    const title=document.createElement("strong");
    title.textContent=t.symbol+" | "+(t.side==="BUY"?"خرید":"فروش");
+
    const state=document.createElement("span");
    state.className=isOpen?"good":"muted";
    state.textContent=isOpen?"باز":"بسته‌شده";
-   head.append(title,state);div.append(head);
-   const grid=document.createElement("div");grid.className="trade-grid";
+
+   head.append(title,state);
+   div.append(head);
+
+   const grid=document.createElement("div");
+   grid.className="trade-grid";
+
    const entries=[
-    ["حجم",fmt(t.volume,4)],["ورود",fmt(t.entry)],
-    ["حد ضرر",fmt(t.sl)],["حد سود",fmt(t.tp)],
-    ["سود/زیان باز",isOpen&&price!==null?fmt(pnl,4):"---"]
+    ["حجم",fmt(t.volume,2)+" لات"],
+    ["ورود",fmt(t.entry)],
+    ["حد ضرر",fmt(t.sl)],
+    ["حد سود",fmt(t.tp)],
+    ["سود/زیان باز",
+     isOpen && price!==null?fmt(pnl,4):"---"]
    ];
+
    entries.forEach(([a,b])=>{
     const item=document.createElement("div");
-    const label=document.createElement("span");label.textContent=a+": ";
-    const value=document.createElement("strong");value.textContent=b;
-    item.append(label,value);grid.append(item);
+
+    const label=document.createElement("span");
+    label.textContent=a+": ";
+
+    const value=document.createElement("strong");
+    value.textContent=b;
+
+    item.append(label,value);
+    grid.append(item);
    });
+
    div.append(grid);
+
    if(isOpen){
     const close=document.createElement("button");
-    close.className="secondary";close.textContent="بستن آزمایشی سفارش";
-    close.style.marginTop="9px";close.style.width="100%";
+
+    close.className="secondary";
+    close.textContent="بستن آزمایشی سفارش";
+    close.style.marginTop="9px";
+    close.style.width="100%";
+
     close.addEventListener("click",()=>{
-     t.status="CLOSED";t.closedAt=new Date().toISOString();
-     saveTrades();renderTrades();
+     t.status="CLOSED";
+     t.closedAt=new Date().toISOString();
+
+     saveTrades();
+     renderTrades();
     });
+
     div.append(close);
    }
+
    list.append(div);
   });
  }
+
  $("tradeCount").textContent=trades.length;
  $("openCount").textContent=open;
  $("totalPnl").textContent=fmt(total,4);
 }
+
 function fillEntry(){
  if(current.mid===null)return;
- $("entry").value=selected()==="USDIRR"?current.mid:
-  ($("orderSide").value==="BUY"?current.ask:current.bid);
+
+ const side=$("orderSide").value;
+
+ $("entry").value=
+  selected()==="USDIRR" ? current.mid :
+  side==="BUY" ? current.ask : current.bid;
+
+ updateRisk();
 }
-$("symbol").addEventListener("change",()=>{history=[];updatePrice()});
-$("orderSide").addEventListener("change",fillEntry);
-$("buyBtn").addEventListener("click",()=>registerOrder("BUY"));
-$("sellBtn").addEventListener("click",()=>registerOrder("SELL"));
-["volume","entry","stopLoss","takeProfit","riskPercent","balance","conversionRate","irrRate"]
-.forEach(id=>$(id).addEventListener("input",()=>{updateRisk();renderTrades()}));
+
+$("symbol").addEventListener("change",()=>{
+ history=[];
+ current={bid:null,ask:null,mid:null};
+
+ $("entry").value="";
+ $("stopLoss").value="";
+ $("takeProfit").value="";
+
+ updatePrice();
+});
+
+$("orderSide").addEventListener("change",()=>{
+ fillEntry();
+});
+
+$("buyBtn").addEventListener("click",()=>{
+ prepareOrder("BUY");
+});
+
+$("sellBtn").addEventListener("click",()=>{
+ prepareOrder("SELL");
+});
+
+[
+ "volume","entry","stopLoss","takeProfit",
+ "riskPercent","balance","conversionRate","irrRate"
+].forEach(id=>{
+ $(id).addEventListener("input",()=>{
+  updateRisk();
+  renderTrades();
+ });
+});
+
 $("clearTrades").addEventListener("click",()=>{
  if(!confirm("تمام سوابق آزمایشی پاک شود؟"))return;
- trades=[];saveTrades();renderTrades();
+
+ trades=[];
+ saveTrades();
+ renderTrades();
+
+ $("orderMessage").textContent="سوابق آزمایشی پاک شد.";
 });
+
 loadTrades();
 updateRisk();
 updatePrice();
+
 setInterval(updatePrice,30000);
 </script>
 </body>
